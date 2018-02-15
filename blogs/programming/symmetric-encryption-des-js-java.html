@@ -1,0 +1,409 @@
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="baidu-site-verification" content="TlEP03OoJ1" />
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="冷泉">
+  
+  
+  
+  
+    <meta name="description" content="对称加密是最快速、最简单的一种加密方式，加密和解密共用一个对称秘钥，因其高效性，被广泛应用在加密协议中。今天恰巧用到，在此总结一下。
+我们项目中需要在前端js里对入参进行DES加密传入后台，后台java再进行解密，网上找了一个谷歌的DES加密js包crypto-js，点此下载
+下载完成之后找到两个js文件引入项目工程中，
+12&lt;script type="text/javascript"...">
+  
+  
+  <title> 对称加密——对入参进行DES加密处理 | Kwin's Blog </title>
+  
+  <title> Kwin's Blog </title>
+  
+    <link rel="alternate" href="/atom.xml" title="Kwin's Blog">
+  
+  
+    <link rel="shortcut icon" href="http://files.cnblogs.com/files/kaidarwang/k.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?6527bfe8d5e773154b0da901dd588d14";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  <script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/blogs/programming/js-event-delegation.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        什么是事件代理？DOM2.0标准事件模型的三个阶段
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/blogs/other/hexo-github-build-blog.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        Hexo+Github/Coding免费搭建个人博客网站
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onClick="openUserCard()">
+          <img id="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400"/>
+          <div id="homelink">Kwin's Blog</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/index.html">Home</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">Archives</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">About</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/wangqingkai">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>对称加密——对入参进行DES加密处理</h1>
+    <p class="page-title-sub">
+      <span id = "post-title-date">Created at 2017-09-20</span>
+      
+
+      
+      
+      <span id = "post-title-categories">Category
+      
+      
+        
+        
+        <a href="/categories/programming/">programming</a>
+      
+      </span>
+      
+      
+      <span id = "post-title-tags">
+      Tag
+      
+      
+        
+        
+        <a href="/tags/encryption/">encryption</a>
+      
+      </span>
+      
+      <span id="busuanzi_container_page_pv">
+        <span id="busuanzi_value_page_pv" style="margin-right: 0;"></span> times read
+      </span>
+    </p>
+    
+    <p>对称加密是最快速、最简单的一种加密方式，加密和解密共用一个对称秘钥，因其高效性，被广泛应用在加密协议中。今天恰巧用到，在此总结一下。</p>
+<p>我们项目中需要在前端<code>js</code>里对入参进行DES加密传入后台，后台<code>java</code>再进行解密，网上找了一个谷歌的DES加密js包<code>crypto-js</code>，<a href="http://vblog.win/downloads/CryptoJS-v3.1.2.zip" target="_blank" rel="external">点此下载</a></p>
+<p>下载完成之后找到两个js文件引入项目工程中，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;script type=<span class="string">"text/javascript"</span> src=<span class="string">"libs/crypto/tripledes.js"</span> &gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div><div class="line">&lt;script type=<span class="string">"text/javascript"</span> src=<span class="string">"libs/crypto/mode-ecb.js"</span> &gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure>
+<p>js中对<code>params</code>（json对象）加密：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">encryptParamsByDES</span>(<span class="params">params, key</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> keyHex = CryptoJS.enc.Utf8.parse(key),</div><div class="line">        desParams = &#123;&#125;;</div><div class="line">    <span class="keyword">if</span>(!params || <span class="built_in">JSON</span>.stringify(params) == <span class="string">'&#123;&#125;'</span>)&#123;</div><div class="line">        <span class="keyword">return</span> &#123;&#125;;</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        $.each(params, <span class="function"><span class="keyword">function</span>(<span class="params">i, val</span>) </span>&#123;</div><div class="line">            <span class="keyword">var</span> desVal = CryptoJS.DES.encrypt(val, keyHex, &#123;</div><div class="line">                <span class="attr">mode</span>: CryptoJS.mode.ECB,</div><div class="line">                <span class="attr">padding</span>: CryptoJS.pad.Pkcs7</div><div class="line">            &#125;);</div><div class="line">            desParams[i] = desVal.toString();</div><div class="line">        &#125;);</div><div class="line">        <span class="keyword">return</span> desParams;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(encryptParamsByDES(&#123;<span class="attr">name</span>: <span class="string">'test'</span>, <span class="attr">password</span>: <span class="string">'123456'</span>&#125;, <span class="string">'kwinwang'</span>));</div></pre></td></tr></table></figure>
+<p>将对称秘钥设置为kwinwang，测试加密输出：</p>
+<blockquote>
+<p>Object {name: “r5vQ2jNkBsc=”, password: “nqp+WDNwUFw=”}</p>
+</blockquote>
+<p>前端加密就完成了，我们再用java尝试解密，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">	String decName = DESUtil.decryption(<span class="string">"r5vQ2jNkBsc="</span>, <span class="string">"kwinwang"</span>);</div><div class="line">	String decPassword = DESUtil.decryption(<span class="string">"nqp+WDNwUFw="</span>, <span class="string">"kwinwang"</span>);</div><div class="line">	System.out.println(<span class="string">"明文name:"</span> + decName);</div><div class="line">	System.out.println(<span class="string">"明文password:"</span> + decPassword);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行main方法，控制台输出：</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/des-crypto/des-test-java-console.png" alt=""></p>
+<p>后台解密成功！简直不敢相信，但就是这么简单。</p>
+<p>附件下载：<a href="http://vblog.win/downloads/DESUtil.zip" target="_blank" rel="external">DESUtil工具类（Java）</a></p>
+
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">Show TOC</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">Hide TOC</button>
+  <div class="random-toc">
+    <h2>Table of Content</h2>
+    
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/blogs/programming/js-event-delegation.html" class="prev">&larr; Prev post 什么是事件代理？DOM2.0标准事件模型的三个阶段</a>
+  
+
+  
+
+  
+    <a href="/blogs/other/hexo-github-build-blog.html" class="next">Next post Hexo+Github/Coding免费搭建个人博客网站 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+      
+      <div id="uyan_frame"></div>
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      <p>
+      &copy; 冷泉
+      
+        Since
+        
+
+        2017
+        
+         - 2018
+        
+      
+      </p>
+      <p>
+      <span id="busuanzi_container_site_pv">
+          Total <span id="busuanzi_value_site_pv"></span> times visits.
+      </span>
+      <span id="busuanzi_container_site_uv">
+          <span id="busuanzi_value_site_uv"></span> visitors.
+      </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400">
+    <p id="description">Kwin's Blog | 个人网站</p>
+    <ul class="social-icon">
+  
+  
+</ul>
+  </div>
+</div>
+
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":28};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<script>
+    $(document).ready(function() {
+        var int_pv = setInterval(fixPvCount, 100);
+        var int_uv = setInterval(fixUvCount, 100);
+        var busuanziSetPv = parseInt(1264);
+        var busuanziSetUv = parseInt(509);
+        function fixPvCount() {
+            if ($("#busuanzi_value_site_pv").html()) {
+                clearInterval(int_pv);
+                $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + busuanziSetPv);
+            }
+        }
+        function fixUvCount() {
+            if ($("#busuanzi_value_site_uv").html()) {
+                clearInterval(int_uv);
+                $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + busuanziSetUv);
+            }
+        }
+    });
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1264474832'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1264474832' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>
+

@@ -1,0 +1,407 @@
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="baidu-site-verification" content="TlEP03OoJ1" />
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="冷泉">
+  
+  
+  
+  
+    <meta name="description" content="先看一个简单例子：123456789var obj = &#123;　　a : 1&#125;var obj1 = obj;function test(b) &#123;　　b.a = 2&#125;test(obj1);console.log(obj.a);//2
+在js中对象属于引用类型，var obj1 = obj 这一步相当于把obj的地址赋值给了obj1，它们两个指向的都是原对象的...">
+  
+  
+  <title> js对象的引用和赋值 | Kwin's Blog </title>
+  
+  <title> Kwin's Blog </title>
+  
+    <link rel="alternate" href="/atom.xml" title="Kwin's Blog">
+  
+  
+    <link rel="shortcut icon" href="http://files.cnblogs.com/files/kaidarwang/k.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?6527bfe8d5e773154b0da901dd588d14";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  <script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/blogs/programming/js-asynchrony-scope-closure.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        你不知道的js异步、作用域、闭包
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/blogs/programming/js-slice-splice-split.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        js中的slice,splice和split
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onClick="openUserCard()">
+          <img id="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400"/>
+          <div id="homelink">Kwin's Blog</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/index.html">Home</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">Archives</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">About</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/wangqingkai">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>js对象的引用和赋值</h1>
+    <p class="page-title-sub">
+      <span id = "post-title-date">Created at 2017-03-16</span>
+      
+
+      
+      
+      <span id = "post-title-categories">Category
+      
+      
+        
+        
+        <a href="/categories/programming/">programming</a>
+      
+      </span>
+      
+      
+      <span id = "post-title-tags">
+      Tag
+      
+      
+        
+        
+        <a href="/tags/JavaScript/">JavaScript</a>
+      
+      </span>
+      
+      <span id="busuanzi_container_page_pv">
+        <span id="busuanzi_value_page_pv" style="margin-right: 0;"></span> times read
+      </span>
+    </p>
+    
+    <p>先看一个简单例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> obj = &#123;</div><div class="line">　　<span class="attr">a</span> : <span class="number">1</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> obj1 = obj;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">b</span>) </span>&#123;</div><div class="line">　　b.a = <span class="number">2</span></div><div class="line">&#125;</div><div class="line">test(obj1);</div><div class="line"><span class="built_in">console</span>.log(obj.a);<span class="comment">//2</span></div></pre></td></tr></table></figure></p>
+<p>在js中对象属于引用类型，<code>var obj1 = obj</code> 这一步相当于把<code>obj</code>的地址赋值给了<code>obj1</code>，它们两个指向的都是原对象的地址，所以通过其中的一个去修改值时其实是修改它们指向的那个对象。上述例子中通过调用test方法改变了原对象的值，因此这里应该输出2。</p>
+<p>对于js的<strong>值类型</strong>和<strong>引用类型</strong>的区分，这里有个通俗的比喻，我们可以用“连锁店”和“总店钥匙”这两个概念来帮助理解。</p>
+<ul>
+<li><p>值类型赋值理解：相当于在一个新的地方按照连锁总店的统一标准（统一店面理解为相同的变量内容）新开一个分店，这样新开的店与总店互不影响、各自运营；</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=<span class="string">'China'</span>;</div><div class="line"><span class="keyword">var</span> b=a;</div><div class="line">a=<span class="string">'USA'</span>;</div><div class="line"><span class="built_in">console</span>.log(b);  <span class="comment">//China</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>引用类型赋值理解：相当于把连锁总店的钥匙（变量引用地址）复制一把给了另外一个老板，此时两个老板同时管理总店，两个老板的行为都有可能对总店的运营造成影响。</p>
+</li>
+</ul>
+<p>正如开篇示例中，引用类型赋值之后修改任何一个对象的值都会影响原对象。注意以下三点：</p>
+<p>1.如果真要复制对象互不影响，则要通过<strong>转换赋值</strong>或者<strong>遍历</strong><code>key:value</code>来复制你的方法和属性。需要注意的是对象的子对象也是引用，所以遍历赋值的时候要判断，子元素是否是对象，如果子元素是对象，则要继续对子元素进行遍历赋值。</p>
+<p>例：转换赋值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> data = &#123;<span class="attr">a</span>:<span class="number">1</span>,<span class="attr">b</span>:<span class="number">2</span>,<span class="attr">c</span>:<span class="number">3</span>,<span class="attr">d</span>:[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;;</div><div class="line"><span class="keyword">var</span> str = <span class="built_in">JSON</span>.stringify(data);</div><div class="line"><span class="keyword">var</span> data1 = <span class="built_in">JSON</span>.parse(str);</div><div class="line">data1[<span class="string">"e"</span>] = <span class="number">4</span>;</div><div class="line">data1[<span class="string">"d"</span>][<span class="number">0</span>] = <span class="number">11</span>;</div><div class="line"><span class="built_in">console</span>.log(data);<span class="comment">//Object &#123;a: 1, b: 2, c: 3, d: [0,1,2,3]&#125;</span></div><div class="line"><span class="built_in">console</span>.log(data1);<span class="comment">//Object &#123;a: 1, b: 2, c: 3, d: [11,1,2,3], e: 4&#125;</span></div></pre></td></tr></table></figure></p>
+<p>2.当对象引用做为函数<strong>参数传递</strong>时，依然会相互影响，如下示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> data = &#123;<span class="attr">a</span>:<span class="number">1</span>,<span class="attr">b</span>:<span class="number">2</span>,<span class="attr">c</span>:<span class="number">3</span>,<span class="attr">d</span>:&#123;<span class="attr">q</span>:<span class="number">4</span>,<span class="attr">w</span>:<span class="number">5</span>,<span class="attr">e</span>:<span class="number">6</span>&#125;&#125;;</div><div class="line"><span class="keyword">var</span> data1 = data;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">con</span>(<span class="params">data2</span>)</span>&#123;</div><div class="line">　　data2[<span class="string">"r"</span>] = <span class="number">5</span>;</div><div class="line">　　<span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data2));</div><div class="line">&#125;</div><div class="line">con(data1);<span class="comment">//&#123;"a":1,"b":2,"c":3,"d":&#123;"q":4,"w":5,"e":6&#125;,"r":5&#125;</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data));<span class="comment">//&#123;"a":1,"b":2,"c":3,"d":&#123;"q":4,"w":5,"e":6&#125;,"r":5&#125;</span></div></pre></td></tr></table></figure>
+<p>3.但是，对象引用赋值后，如果将对象<strong>置空</strong>，相互间是不受影响的，如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> arr = &#123;<span class="string">"a"</span>:<span class="string">"1"</span>,<span class="string">"b"</span>:<span class="string">"2"</span>&#125;;</div><div class="line"><span class="keyword">var</span> arr1 = arr;</div><div class="line">arr = &#123;&#125;;</div><div class="line">arr[<span class="string">"a"</span>] = <span class="number">2</span>;</div><div class="line"><span class="built_in">console</span>.log(arr1);<span class="comment">//Object &#123;a: "1", b: "2"&#125;</span></div><div class="line"><span class="built_in">console</span>.log(arr);<span class="comment">//Object &#123;a: 2&#125;</span></div></pre></td></tr></table></figure>
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">Show TOC</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">Hide TOC</button>
+  <div class="random-toc">
+    <h2>Table of Content</h2>
+    
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/blogs/programming/js-asynchrony-scope-closure.html" class="prev">&larr; Prev post 你不知道的js异步、作用域、闭包</a>
+  
+
+  
+
+  
+    <a href="/blogs/programming/js-slice-splice-split.html" class="next">Next post js中的slice,splice和split &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+      
+      <div id="uyan_frame"></div>
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      <p>
+      &copy; 冷泉
+      
+        Since
+        
+
+        2017
+        
+         - 2018
+        
+      
+      </p>
+      <p>
+      <span id="busuanzi_container_site_pv">
+          Total <span id="busuanzi_value_site_pv"></span> times visits.
+      </span>
+      <span id="busuanzi_container_site_uv">
+          <span id="busuanzi_value_site_uv"></span> visitors.
+      </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400">
+    <p id="description">Kwin's Blog | 个人网站</p>
+    <ul class="social-icon">
+  
+  
+</ul>
+  </div>
+</div>
+
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":28};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<script>
+    $(document).ready(function() {
+        var int_pv = setInterval(fixPvCount, 100);
+        var int_uv = setInterval(fixUvCount, 100);
+        var busuanziSetPv = parseInt(1264);
+        var busuanziSetUv = parseInt(509);
+        function fixPvCount() {
+            if ($("#busuanzi_value_site_pv").html()) {
+                clearInterval(int_pv);
+                $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + busuanziSetPv);
+            }
+        }
+        function fixUvCount() {
+            if ($("#busuanzi_value_site_uv").html()) {
+                clearInterval(int_uv);
+                $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + busuanziSetUv);
+            }
+        }
+    });
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1264474832'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1264474832' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>
+

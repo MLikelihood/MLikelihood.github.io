@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Kwin&#39;s Blog</title>
+  <subtitle>心向往之，行必能至</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://wangqingkai.github.io/"/>
+  <updated>2017-10-31T14:55:31.067Z</updated>
+  <id>https://wangqingkai.github.io/</id>
+  
+  <author>
+    <name>冷泉</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>什么是事件代理？DOM2.0标准事件模型的三个阶段</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-event-delegation.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-event-delegation.html</id>
+    <published>2017-10-29T14:42:02.000Z</published>
+    <updated>2017-10-31T14:55:31.067Z</updated>
+    
+    <content type="html"><![CDATA[<p>事件代理，又称事件委托（Delegation），就是将处理事件委派到父元素或者顶级元素上，利用事件的冒泡机制，管理某一类型元素上的所有事件。</p>
+<p>要理解这个概念，必须先对事件模型有个初步的了解。W3C定义的DOM2.0标准事件模型分为三个阶段：</p>
+<blockquote>
+<ol>
+<li>捕获阶段</li>
+<li>目标阶段</li>
+<li>冒泡阶段</li>
+</ol>
+</blockquote>
+<p><strong>捕获阶段</strong>：当某个元素触发事件时，顶层对象document会发出一个事件流，随着DOM树向着目标元素流去直到到达目标元素，途径的元素如果绑定了事件，在这个阶段是不会执行的；<br><strong>目标阶段</strong>：事件流找到了目标元素，执行目标元素相应的处理函数，如果没有绑定任何事件，则不执行；<br><strong>冒泡阶段</strong>：事件流从目标元素向顶层元素折回，遇到绑定事件，即执行（该阶段在IE6中不存在）；</p>
+<p>因此我们发现，在元素绑定事件时，完全可以绑定在该元素的任一上级元素上再进行事件处理即可。那么，事件代理具体怎么应用呢？</p>
+<p>例如，页面中有这样一个无序列表，需要给每个<code>li</code>添加点击事件，弹出相应内容，如果我们通过for循环为每个<code>li</code>单独绑定click事件，由于元素数量过多无疑会造成网页性能下降，有内存泄露的风险。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"ul-test"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-1"</span>&gt;</span>11<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-2"</span>&gt;</span>22<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-3"</span>&gt;</span>33<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-4"</span>&gt;</span>44<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-5"</span>&gt;</span>55<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>如果将click事件绑定在<code>ul</code>元素上，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">　　<span class="keyword">var</span> ulEle = <span class="built_in">document</span>.getElementById(<span class="string">"ul-test"</span>);</div><div class="line">　　ulEle.onclick = <span class="function"><span class="keyword">function</span>(<span class="params">ev</span>)</span>&#123;</div><div class="line">　　　　<span class="keyword">var</span> ev = ev || <span class="built_in">window</span>.event;</div><div class="line">　　　　<span class="keyword">var</span> target = ev.target || ev.srcElement;</div><div class="line">　　　　<span class="keyword">if</span>(target.nodeName.toLowerCase() == <span class="string">'li'</span>)&#123;</div><div class="line">　　　　　　alert(target.innerHTML);</div><div class="line">　　　　　　<span class="keyword">if</span>(target.id == <span class="string">'li-3'</span>)&#123;</div><div class="line">　　　　　　   alert(<span class="string">'click li-3'</span>); </div><div class="line">　　　　　　&#125;</div><div class="line">　　　　&#125;</div><div class="line">　　&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上述代码中，我们只需要绑定一次事件，通过Event对象的target属性返回事件源（即事件的目标节点），可以做不同的处理，这就是事件代理，原本需要目标元素处理的事件，交由其父元素代为执行。采用事件代理避免了频繁的操作DOM，优化效果可想而知。</p>
+<p>以上只是对事件代理的基本认识和应用，更深层次应用有待挖掘。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;事件代理，又称事件委托（Delegation），就是将处理事件委派到父元素或者顶级元素上，利用事件的冒泡机制，管理某一类型元素上的所有事件。&lt;/p&gt;
+&lt;p&gt;要理解这个概念，必须先对事件模型有个初步的了解。W3C定义的DOM2.0标准事件模型分为三个阶段：&lt;/p&gt;
+&lt;bloc
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>对称加密——对入参进行DES加密处理</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/symmetric-encryption-des-js-java.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/symmetric-encryption-des-js-java.html</id>
+    <published>2017-09-20T12:17:00.000Z</published>
+    <updated>2017-09-23T14:13:51.776Z</updated>
+    
+    <content type="html"><![CDATA[<p>对称加密是最快速、最简单的一种加密方式，加密和解密共用一个对称秘钥，因其高效性，被广泛应用在加密协议中。今天恰巧用到，在此总结一下。</p>
+<p>我们项目中需要在前端<code>js</code>里对入参进行DES加密传入后台，后台<code>java</code>再进行解密，网上找了一个谷歌的DES加密js包<code>crypto-js</code>，<a href="http://vblog.win/downloads/CryptoJS-v3.1.2.zip" target="_blank" rel="external">点此下载</a></p>
+<p>下载完成之后找到两个js文件引入项目工程中，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;script type=<span class="string">"text/javascript"</span> src=<span class="string">"libs/crypto/tripledes.js"</span> &gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div><div class="line">&lt;script type=<span class="string">"text/javascript"</span> src=<span class="string">"libs/crypto/mode-ecb.js"</span> &gt;<span class="xml"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></div></pre></td></tr></table></figure>
+<p>js中对<code>params</code>（json对象）加密：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">encryptParamsByDES</span>(<span class="params">params, key</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> keyHex = CryptoJS.enc.Utf8.parse(key),</div><div class="line">        desParams = &#123;&#125;;</div><div class="line">    <span class="keyword">if</span>(!params || <span class="built_in">JSON</span>.stringify(params) == <span class="string">'&#123;&#125;'</span>)&#123;</div><div class="line">        <span class="keyword">return</span> &#123;&#125;;</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        $.each(params, <span class="function"><span class="keyword">function</span>(<span class="params">i, val</span>) </span>&#123;</div><div class="line">            <span class="keyword">var</span> desVal = CryptoJS.DES.encrypt(val, keyHex, &#123;</div><div class="line">                <span class="attr">mode</span>: CryptoJS.mode.ECB,</div><div class="line">                <span class="attr">padding</span>: CryptoJS.pad.Pkcs7</div><div class="line">            &#125;);</div><div class="line">            desParams[i] = desVal.toString();</div><div class="line">        &#125;);</div><div class="line">        <span class="keyword">return</span> desParams;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(encryptParamsByDES(&#123;<span class="attr">name</span>: <span class="string">'test'</span>, <span class="attr">password</span>: <span class="string">'123456'</span>&#125;, <span class="string">'kwinwang'</span>));</div></pre></td></tr></table></figure>
+<p>将对称秘钥设置为kwinwang，测试加密输出：</p>
+<blockquote>
+<p>Object {name: “r5vQ2jNkBsc=”, password: “nqp+WDNwUFw=”}</p>
+</blockquote>
+<p>前端加密就完成了，我们再用java尝试解密，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">	String decName = DESUtil.decryption(<span class="string">"r5vQ2jNkBsc="</span>, <span class="string">"kwinwang"</span>);</div><div class="line">	String decPassword = DESUtil.decryption(<span class="string">"nqp+WDNwUFw="</span>, <span class="string">"kwinwang"</span>);</div><div class="line">	System.out.println(<span class="string">"明文name:"</span> + decName);</div><div class="line">	System.out.println(<span class="string">"明文password:"</span> + decPassword);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>执行main方法，控制台输出：</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/des-crypto/des-test-java-console.png" alt=""></p>
+<p>后台解密成功！简直不敢相信，但就是这么简单。</p>
+<p>附件下载：<a href="http://vblog.win/downloads/DESUtil.zip" target="_blank" rel="external">DESUtil工具类（Java）</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;对称加密是最快速、最简单的一种加密方式，加密和解密共用一个对称秘钥，因其高效性，被广泛应用在加密协议中。今天恰巧用到，在此总结一下。&lt;/p&gt;
+&lt;p&gt;我们项目中需要在前端&lt;code&gt;js&lt;/code&gt;里对入参进行DES加密传入后台，后台&lt;code&gt;java&lt;/code&gt;再进行
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="encryption" scheme="https://wangqingkai.github.io/tags/encryption/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hexo+Github/Coding免费搭建个人博客网站</title>
+    <link href="https://wangqingkai.github.io/blogs/other/hexo-github-build-blog.html"/>
+    <id>https://wangqingkai.github.io/blogs/other/hexo-github-build-blog.html</id>
+    <published>2017-09-12T14:18:09.000Z</published>
+    <updated>2017-10-04T07:18:38.948Z</updated>
+    
+    <content type="html"><![CDATA[<p>很早之前就想搭建一个属于自己的博客网站，一方面是给自己做笔记，把平时遇到的问题和解决问题的方式方法记录下来，顺便提升自己的表达能力、总结能力；另一方面，个人博客就像是自己在网络世界中的一个小家，一个完全属于自己的空间，你可以在这里尽情发挥，别人可以通过它来了解你。前段时间偶然间发现了Hexo，看了两天<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">官方文档</a>，参考网上教程，搭建了自己的个人网站：<a href="http://vblog.win/" target="_blank" rel="external">http://vblog.win/</a> 欢迎访问！搭建完毕在此记录一下搭建过程。</p>
+<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1. 环境准备"></a>1. 环境准备</h2><h3 id="1-1-node-js安装和准备"><a href="#1-1-node-js安装和准备" class="headerlink" title="1.1 node.js安装和准备"></a>1.1 node.js安装和准备</h3><p>在node.js官网 <a href="http://nodejs.cn/download/" target="_blank" rel="external">http://nodejs.cn/download/</a> 下载对应安装文件，保持默认设置，一路next，安装结束。<br>打开命令提示符，输入<code>node -v</code>，<code>npm -v</code>输出当前版本号说明node环境搭建完成。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/cmd-node-version.png" alt=""></p>
+<h3 id="1-2-git安装和准备"><a href="#1-2-git安装和准备" class="headerlink" title="1.2 git安装和准备"></a>1.2 git安装和准备</h3><p>在Git官网 <a href="https://git-scm.com/downloads" target="_blank" rel="external">https://git-scm.com/downloads</a> （如未翻墙下载过慢可参考<a href="https://github.com/waylau/git-for-win" target="_blank" rel="external">地址</a>）下载对应安装文件，保持默认设置一路next也没毛病，这里一点提醒，Git出于安全考虑，只能在<code>Git Bash</code>中进行Git有关的命令操作，如果想要在命令提示符中使用Git命令，在安装过程中调整PATH环境一步需勾选第二项，这样Git安装程序会在系统PATH中设置Git路径，以便于我们在命令提示符中直接使用Git命令（尽管可以这样设置，但还是建议都在Git Bash中输入命令）。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/git-setup-not-default.jpg" alt=""></p>
+<p>打开命令提示符，输入<code>git --version</code>输出当前版本号说明Git环境搭建完成。</p>
+<h2 id="2-Github账户配置"><a href="#2-Github账户配置" class="headerlink" title="2. Github账户配置"></a>2. Github账户配置</h2><h3 id="2-1-创建仓库"><a href="#2-1-创建仓库" class="headerlink" title="2.1 创建仓库"></a>2.1 创建仓库</h3><p>相信很多coder都有自己的GitHub账号（没有的话去<a href="http://github.com/" target="_blank" rel="external">注册一下</a>），利用GitHub建立自己的博客首先需要创建一个<code>username.github.io</code>的仓库，这里的<code>username</code>必须是你的用户名（不是昵称），之后你的个人博客地址就是 <a href="http://username.github.io" target="_blank" rel="external">http://username.github.io</a> 了。</p>
+<h3 id="2-2-代码库设置"><a href="#2-2-代码库设置" class="headerlink" title="2.2 代码库设置"></a>2.2 代码库设置</h3><p>接下来，在新建立好的仓库主页点击菜单栏Settings，找到下方GitHub Pages开启该功能，选择一个主题并提交更改，几分钟后打开 <a href="http://username.github.io" target="_blank" rel="external">http://username.github.io</a> 你就可以访问自己的博客主页了。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/open-github-pages.png" alt=""></p>
+<h3 id="2-3-配置SSH-key"><a href="#2-3-配置SSH-key" class="headerlink" title="2.3 配置SSH key"></a>2.3 配置SSH key</h3><p>因为我们的博客内容托管于GitHub，因此提交代码需要提供权限给本地，这里使用SSH key相对来说要安全一些，输入命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -t rsa -C <span class="string">"注册邮箱"</span></div></pre></td></tr></table></figure>
+<p>之后会提示输入一个密码，这个密码在提交代码时使用，这里也可以直接回车，密码置空。最终会在用户目录下生成<code>.ssh</code>文件夹，进入文件夹找到<code>id_rsa.pub</code>文件并打开，复制内容并打开 <a href="https://github.com/settings/keys" target="_blank" rel="external">https://github.com/settings/keys</a> 新建SSH key，title自己命名，把刚刚复制的内容粘贴到key处保存，设置完毕。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/add-ssh-key.png" alt=""></p>
+<p>测试配置是否成功：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -T git@github.com</div></pre></td></tr></table></figure>
+<blockquote>
+<p>Hi wangqingkai! You’ve successfully authenticated, but GitHub does not provide shell access.</p>
+</blockquote>
+<p>看到如上信息则说明SSH key配置成功。</p>
+<h3 id="2-4-配置Git个人信息"><a href="#2-4-配置Git个人信息" class="headerlink" title="2.4 配置Git个人信息"></a>2.4 配置Git个人信息</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git config --global user.name <span class="string">"username"</span> <span class="comment">// github用户名，不是昵称</span></div><div class="line">git config --global user.email  <span class="string">"xxx@qq.com"</span> <span class="comment">// github注册邮箱</span></div></pre></td></tr></table></figure>
+<h2 id="3-Hexo安装与配置"><a href="#3-Hexo安装与配置" class="headerlink" title="3. Hexo安装与配置"></a>3. Hexo安装与配置</h2><p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。还是推荐花时间看下官方文档：<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">https://hexo.io/zh-cn/docs/</a></p>
+<h3 id="3-1-Hexo安装"><a href="#3-1-Hexo安装" class="headerlink" title="3.1 Hexo安装"></a>3.1 Hexo安装</h3><p>新建一个用于存放个人博客源文件的文件夹，进入文件夹开始安装Hexo，由于npm下载一些包在国内会非常慢，这里推荐使用淘宝镜像，右击<code>Git Bash</code>输入以下命令等待安装：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install -g cnpm --registry=https:<span class="comment">//registry.npm.taobao.org</span></div></pre></td></tr></table></figure>
+<p>安装完成之后基本所有命令中的<code>npm</code>都可以用<code>cnpm</code>替代。输入命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cnpm install -g hexo</div></pre></td></tr></table></figure>
+<p>Hexo安装完成之后紧接着开始初始化，输入命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo init <span class="comment">// hexo初始化</span></div><div class="line">hexo g <span class="comment">// 生成网站源文件</span></div></pre></td></tr></table></figure>
+<p>生成之后的目录结构应该是这样的，</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/hexo-directory.png" alt=""></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo s <span class="comment">// 启动本地测试服务</span></div></pre></td></tr></table></figure>
+<p>服务启好之后浏览器打开 <a href="http://localhost:4000" target="_blank" rel="external">http://localhost:4000</a> ，如果可以正常访问，说明我们本地博客已经搭建起来了。Ctrl+C关闭测试服务。</p>
+<h3 id="3-2-Hexo配置"><a href="#3-2-Hexo配置" class="headerlink" title="3.2 Hexo配置"></a>3.2 Hexo配置</h3><h4 id="3-2-1-Hexo主题配置"><a href="#3-2-1-Hexo主题配置" class="headerlink" title="3.2.1 Hexo主题配置"></a>3.2.1 Hexo主题配置</h4><p>因为默认主题达不到我们的要求，首先对Hexo主题进行配置，这里是Hexo<a href="https://hexo.io/themes/" target="_blank" rel="external">官方主题</a>。我们用比较受大众喜爱的<code>yilia</code>主题为例，在博客根目录输入命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https:<span class="comment">//github.com/litten/hexo-theme-yilia.git themes/yilia</span></div></pre></td></tr></table></figure>
+<p>之后修改博客根目录下<code>_config.yml</code>文件中主题配置为：<code>theme: yilia</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo clean <span class="comment">// clean删除public文件夹</span></div><div class="line">hexo s -g <span class="comment">// 生成网站源文件并启动测试服务（合并命令）</span></div></pre></td></tr></table></figure>
+<p>刷新 <a href="http://localhost:4000" target="_blank" rel="external">http://localhost:4000</a> 是不是发现高端大气上档次了一些！至于头像、title、菜单等的配置，仔细读一下<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">官方文档</a>，研究一下配置文件（主要有两个<code>_config.yml</code>，一个在博客根目录下，另一个在themes下对应的主题文件夹下），相信这些都难不倒你。</p>
+<h4 id="3-2-2-Deployment配置"><a href="#3-2-2-Deployment配置" class="headerlink" title="3.2.2 Deployment配置"></a>3.2.2 Deployment配置</h4><p>这个很关键，因为博客搭建好了，你不可能让它一直在本地运行，需要把它托管到GitHub或者Coding上，别人才可以访问，因此需要配置Deployment。全局配置文件<code>_config.yml</code>中找到Deployment，配置如下代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repo:</div><div class="line">      github: git@github.com:username/username.github.io.git,master</div><div class="line">      coding: git@git.coding.net:username/username.git,master</div></pre></td></tr></table></figure>
+<p>我这里同时托管到GitHub和Coding，单独托管到GitHub也可以，把另外一条配置去掉就好。不过这样配置提交的时候一般会报错<code>ERROR Deployer not found: git</code>，不要慌，安装一个插件即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cnpm install hexo-deployer-git --save</div></pre></td></tr></table></figure>
+<h4 id="3-2-3-Hexo部署到Git"><a href="#3-2-3-Hexo部署到Git" class="headerlink" title="3.2.3 Hexo部署到Git"></a>3.2.3 Hexo部署到Git</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo clean</div><div class="line">hexo d -g <span class="comment">// 生成网站源文件并部署到Git（合并命令）</span></div></pre></td></tr></table></figure>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/hexo-d-success.png" alt=""></p>
+<p>现在到浏览器里访问一下 <a href="http://vueker.github.io" target="_blank" rel="external">http://vueker.github.io</a> 惊不惊喜，意不意外！这里是我的测试博客，欢迎访问正式博客 <a href="http://vblog.win/" target="_blank" rel="external">http://vblog.win/</a> 查看效果，与我交流。</p>
+<h2 id="4-如何写博客"><a href="#4-如何写博客" class="headerlink" title="4. 如何写博客"></a>4. 如何写博客</h2><h3 id="4-1-使用命令创建博客"><a href="#4-1-使用命令创建博客" class="headerlink" title="4.1 使用命令创建博客"></a>4.1 使用命令创建博客</h3><p>cd到博客根目录，输入命令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo <span class="keyword">new</span> <span class="string">'hello-first-blog'</span></div></pre></td></tr></table></figure>
+<p>这样，Hexo会帮我们在<code>\source\_posts</code>下新建md文件，打开该文件即可使用Markdown语法开始写博客。</p>
+<h3 id="4-2-手动新建md文件"><a href="#4-2-手动新建md文件" class="headerlink" title="4.2 手动新建md文件"></a>4.2 手动新建md文件</h3><p>当然，我们也可以在<code>\source\_posts</code>目录下新建md文件直接进行编辑，需要注意的是md文件的命名一般采用英文，文件内title名为中文即可。推荐作业部落<a href="https://www.zybuluo.com" target="_blank" rel="external">在线编辑器</a>。</p>
+<h2 id="5-后记"><a href="#5-后记" class="headerlink" title="5. 后记"></a>5. 后记</h2><p>Hexo + Github搭建静态博客的确很方便，上手也不难，而且静态博客访问速度快，易于维护，很重要的一点它是完全免费的。目前还可以采用很多第三方系统进行扩展服务，只要你想，几乎都可以做到。在此记录下自己搭建博客的点滴，希望可以和广大coder一起交流，共同进步，欢迎访问<a href="http://vblog.win/" target="_blank" rel="external">主页</a>。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;很早之前就想搭建一个属于自己的博客网站，一方面是给自己做笔记，把平时遇到的问题和解决问题的方式方法记录下来，顺便提升自己的表达能力、总结能力；另一方面，个人博客就像是自己在网络世界中的一个小家，一个完全属于自己的空间，你可以在这里尽情发挥，别人可以通过它来了解你。前段时间偶
+    
+    </summary>
+    
+      <category term="other" scheme="https://wangqingkai.github.io/categories/other/"/>
+    
+    
+      <category term="website" scheme="https://wangqingkai.github.io/tags/website/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>手机自带输入法输入的emoji表情如何提交后台保存数据库</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/emoji-transform-commit.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/emoji-transform-commit.html</id>
+    <published>2017-08-31T07:18:24.000Z</published>
+    <updated>2017-10-04T07:20:50.599Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　之前就遇到过需要前端支持用户输入并提交emoji表情的问题，一直没有着手解决，今天再一次狭路相逢，该来的躲不过，那就尝试去解决吧。</p>
+<p>　　大多数emoji表情都是<strong>4字节</strong>的<strong>utf-16</strong>编码（为辅助平面字符，另有少部分表情属于2字节的基本平面字符），而我们的MySQL数据库采用utf-8，并且最大允许<strong>3字节</strong>的字符，因此前端提交由用户输入的4字节的emoji表情在存入数据库时会报错。在后台不动的情况下，有一种解决方案就是前端进行处理，将emoji表情转换为<strong>字符实体</strong>再提交。<br>　　<br><img src="http://ovn7viqux.bkt.clouddn.com/emoji-code.png" alt=""><br>　　<br>　　这是一张Unicode字符百科的截图，前三个是2字节的基本平面字符，之后的是4字节的辅助平面字符，例如Grinning Face，<img src="http://ovn7viqux.bkt.clouddn.com/emoji-code-1.png" alt="">是它的utf-16的编码，<img src="http://ovn7viqux.bkt.clouddn.com/emoji-code-2.png" alt="">就是它的字符实体，这一类也就是我们要进行处理的一类。</p>
+<p>　　我们要将这一类emoji表情转为字符实体存入数据库，首先要进行字符检测，这里要用到正则表达式，由于JavaScript采用ucs-2编码，所有字符在JavaScript中都是2字节，所以4字节的emoji表情会被当做两个双字节字符处理，这里有个高位（H）和低位（L）的概念（有兴趣请阅读阮一峰老师<a href="http://www.ruanyifeng.com/blog/2014/12/unicode.html" target="_blank" rel="external">一篇文章</a>），所以我们检测4字节emoji表情的正则表达式应该是：<code>/[\ud800-\udbff][\udc00-\udfff]/g</code>。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/uncode-formula.png" alt=""></p>
+<p>　　阮老师文章中提到了utf-16转ucs-2(unicode)的公式，我们需要进行反推来转换成我们需要的ucs-2编码。这里是Demo中的一个处理函数供参考：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">utf16toEntities: <span class="function"><span class="keyword">function</span>(<span class="params">str</span>) </span>&#123; <span class="comment">//检测utf16emoji表情 转换为实体字符以供后台存储</span></div><div class="line">    <span class="keyword">var</span> patt=<span class="regexp">/[\ud800-\udbff][\udc00-\udfff]/g</span>;</div><div class="line">    str = str.replace(patt, <span class="function"><span class="keyword">function</span>(<span class="params">char</span>)</span>&#123;</div><div class="line">        <span class="keyword">var</span> H, L, code;</div><div class="line">        <span class="keyword">if</span> (char.length===<span class="number">2</span>) &#123;   <span class="comment">//辅助平面字符（我们需要做处理的一类）</span></div><div class="line">            H = char.charCodeAt(<span class="number">0</span>); <span class="comment">// 取出高位</span></div><div class="line">            L = char.charCodeAt(<span class="number">1</span>); <span class="comment">// 取出低位</span></div><div class="line">            code = (H - <span class="number">0xD800</span>) * <span class="number">0x400</span> + <span class="number">0x10000</span> + L - <span class="number">0xDC00</span>; <span class="comment">// 转换算法</span></div><div class="line">            <span class="keyword">return</span> <span class="string">"&amp;#"</span> + code + <span class="string">";"</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> char;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> str;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　经过上述转换，我们手机端输入的emoji表情应该就可以提交到数据库了，but…解决问题往往不会这么一帆风顺，我们发现正常保存的emoji表情在页面上不能正常显示，我们前端采用angular开发，用&#123;&#123;&#125;&#125;将包含emoji字符实体的字符串渲染到页面上时显示的直接是这样<img src="http://ovn7viqux.bkt.clouddn.com/128514.png" alt="">的字符实体，审查元素发现HTML内容是这样<img src="http://ovn7viqux.bkt.clouddn.com/ub-html-code.png" alt="">，一时还不知道原因是什么，但一定是用&#123;&#123;&#125;&#125;渲染有问题，尝试换用ng-bind-html，<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"bloodPressureRemarks text-left ellipsis"</span> <span class="attr">ng-bind-html</span>=<span class="string">"item.remarks"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>　　问题解决！</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;　　之前就遇到过需要前端支持用户输入并提交emoji表情的问题，一直没有着手解决，今天再一次狭路相逢，该来的躲不过，那就尝试去解决吧。&lt;/p&gt;
+&lt;p&gt;　　大多数emoji表情都是&lt;strong&gt;4字节&lt;/strong&gt;的&lt;strong&gt;utf-16&lt;/strong&gt;编码（为
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>改变函数中的 this 指向——神奇的call,apply和bind及其应用</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-this-call-apply-bind.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-this-call-apply-bind.html</id>
+    <published>2017-06-29T02:18:00.000Z</published>
+    <updated>2017-09-02T05:36:08.778Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】在JavaScript 中，call、apply 和 bind 是 Function 对象自带的三个方法，这三个方法的主要作用是改变函数中的 this 指向，从而可以达到<code>接花移木</code>的效果。本文将对这三个方法进行详细的讲解，并列出几个经典应用场景。 1、call(thisArgs [,args… <a href="http://www.cnblogs.com/kaidarwang/p/7093055.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】在JavaScript 中，call、apply 和 bind 是 Function 对象自带的三个方法，这三个方法的主要作用是改变函数中的 this 指向，从而可以达到&lt;code&gt;接花移木&lt;/code&gt;的效果。本文将对这三个方法进行详细的讲解，并列出几个经典应用场
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>什么是jsonp？——使用jsonp解决跨域请求问题</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/jsonp-cross-domain.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/jsonp-cross-domain.html</id>
+    <published>2017-06-15T08:38:00.000Z</published>
+    <updated>2017-09-02T05:37:22.013Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】我们在使用ajax请求的时候经常会产生跨域问题，这是由于浏览器的同源策略导致的。所谓同源，即域名、协议、端口均相同，否则不管是静态页面还是动态网页或者web服务都无法通过ajax正常请求。有时候，我们可以通过jsonp来解决。 jsonp的数据传输方式是利用了 script标签src属性中的链接可以 <a href="http://www.cnblogs.com/kaidarwang/p/7018622.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】我们在使用ajax请求的时候经常会产生跨域问题，这是由于浏览器的同源策略导致的。所谓同源，即域名、协议、端口均相同，否则不管是静态页面还是动态网页或者web服务都无法通过ajax正常请求。有时候，我们可以通过jsonp来解决。 jsonp的数据传输方式是利用了 sc
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="jsonp" scheme="https://wangqingkai.github.io/tags/jsonp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>玩转angularJs——通过自定义ng-model，不仅仅只是input可以实现双向数据绑定</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/angularJs-user-defined-ngmodel.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/angularJs-user-defined-ngmodel.html</id>
+    <published>2017-05-22T11:38:00.000Z</published>
+    <updated>2017-09-08T14:50:03.958Z</updated>
+    
+    <content type="html"><![CDATA[<p>AngularJs双向绑定特性在开发中很方便很实用，但是由于<code>ng-model</code>一般只能挂在<code>input</code>,<code>textarea</code>上，因此我们需要自定义<code>ng-model</code>来在<code>div</code>等元素上使用该标签。</p>
+<p>自定义指令：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">.directive(<span class="string">'contenteditable'</span>, [<span class="string">'$window'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> &#123;</div><div class="line">        <span class="attr">restrict</span>: <span class="string">'A'</span>,</div><div class="line">        <span class="attr">require</span>: <span class="string">'?ngModel'</span>,</div><div class="line">        <span class="attr">link</span>: <span class="function"><span class="keyword">function</span>(<span class="params">scope, element, attrs, ngModel</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (!ngModel) &#123;</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">            ngModel.$render = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">                element.html(ngModel.$viewValue || <span class="string">''</span>);</div><div class="line">            &#125;;</div><div class="line">            element.on(<span class="string">'blur keyup change'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">                scope.$apply(readViewText);</div><div class="line">            &#125;);</div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">readViewText</span>(<span class="params"></span>) </span>&#123;</div><div class="line">                <span class="keyword">var</span> html = element.html();</div><div class="line">                <span class="keyword">if</span> (attrs.stripBr &amp;&amp; html === <span class="string">'&lt;br&gt;'</span>) &#123;</div><div class="line">                    html = <span class="string">''</span>;</div><div class="line">                &#125;</div><div class="line">                ngModel.$setViewValue(html);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;])</div></pre></td></tr></table></figure>
+<p><code>html</code>页面中<code>div</code>可以这样使用<code>ng-model</code>:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"icon-arrow-title title-color-2"</span> <span class="attr">contenteditable</span>=<span class="string">"true"</span> <span class="attr">ng-model</span>=<span class="string">"param.MobileNum"</span> <span class="attr">style</span>=<span class="string">"right: 15px;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这样，当前<code>div</code>为可编辑状态，双向数据绑定就可以了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;AngularJs双向绑定特性在开发中很方便很实用，但是由于&lt;code&gt;ng-model&lt;/code&gt;一般只能挂在&lt;code&gt;input&lt;/code&gt;,&lt;code&gt;textarea&lt;/code&gt;上，因此我们需要自定义&lt;code&gt;ng-model&lt;/code&gt;来在&lt;code&gt;
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="AngularJs" scheme="https://wangqingkai.github.io/tags/AngularJs/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>利用jquery mobiscroll插件选择日期、select、treeList的具体运用</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/jquery-mobiscroll-select-treeList.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/jquery-mobiscroll-select-treeList.html</id>
+    <published>2017-05-13T09:58:00.000Z</published>
+    <updated>2017-09-28T13:42:47.142Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　mobiscroll是个很好用的用于移动端滑动选择的插件，可以用来选择日期，也可以用来选择简单选项或者一些复杂的树形结构的选项，简单分享下。</p>
+<p>　　依赖也比较简单，引入一个<code>mobiscroll-2.13.2.full.min.js</code>文件和一个<code>mobiscroll-2.13.2.full.min.css</code>文件即可。可直接下载<a href="http://vblog.win/downloads/mobiscroll-2.13.2.zip" target="_blank" rel="external">mobiscroll-2.13.2</a> ，官网 <a href="http://docs.mobiscroll.com" target="_blank" rel="external">http://docs.mobiscroll.com</a></p>
+<h3 id="1-日期选择"><a href="#1-日期选择" class="headerlink" title="1. 日期选择"></a>1. 日期选择</h3><p>　　先看效果图：</p>
+<p>　　<img src="http://ovn7viqux.bkt.clouddn.com/blog/mobiscroll/mobiscroll-date.png" alt=""><br>　　js代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> opt=&#123;&#125;;</div><div class="line">opt.datetime = &#123;&#125;;</div><div class="line">opt.default = &#123;</div><div class="line">        <span class="attr">theme</span>: <span class="string">'ios7'</span>,</div><div class="line">        <span class="attr">display</span>: display,</div><div class="line">        <span class="attr">mode</span>: <span class="string">'scroller'</span>,</div><div class="line">        <span class="attr">dateFormat</span>: <span class="string">'yy-mm-dd'</span>,</div><div class="line">        <span class="attr">dateOrder</span>: <span class="string">'yymmdd'</span>,</div><div class="line">        <span class="attr">dayText</span>: <span class="string">'日'</span>, <span class="attr">monthText</span>: <span class="string">'月'</span>, <span class="attr">yearText</span>: <span class="string">'年'</span>,<span class="attr">hourText</span>: <span class="string">'时'</span>,<span class="attr">minuteText</span>: <span class="string">'分'</span>,</div><div class="line">        <span class="attr">lang</span>: <span class="string">'zh'</span>,</div><div class="line">        <span class="attr">stepMinute</span>: <span class="number">10</span>,</div><div class="line">        <span class="attr">showNow</span>: <span class="literal">true</span>,</div><div class="line">        <span class="attr">nowText</span>: <span class="string">"当前"</span>,</div><div class="line">        <span class="attr">startYear</span>: currYear,</div><div class="line">        <span class="attr">endYear</span>: currYear+<span class="number">1</span>,</div><div class="line">        <span class="attr">onSelect</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</div><div class="line">            <span class="comment">//点击确定触发的事件</span></div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> optDateTime = $.extend(opt[<span class="string">'datetime'</span>], opt[<span class="string">'default'</span>]);</div><div class="line">$(<span class="string">"#"</span>+id).mobiscroll(optDateTime).datetime(optDateTime);</div><div class="line"></div><div class="line"><span class="keyword">this</span>.mscroller = jq;</div></pre></td></tr></table></figure></p>
+<h3 id="2-简单选项的滑动选择-select"><a href="#2-简单选项的滑动选择-select" class="headerlink" title="2. 简单选项的滑动选择(select)"></a>2. 简单选项的滑动选择(select)</h3><p>　　<img src="http://ovn7viqux.bkt.clouddn.com/blog/mobiscroll/mobiscroll-select.png" alt=""><br>　　js代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#'</span> + id).mobiscroll().select(&#123;</div><div class="line">    <span class="attr">theme</span>: <span class="string">'android-ics light'</span>,</div><div class="line">    <span class="attr">mode</span>: <span class="string">'scroller'</span>,</div><div class="line">    <span class="attr">display</span>: <span class="string">'bottom'</span>,</div><div class="line">    <span class="attr">lang</span>: <span class="string">'zh'</span>,</div><div class="line">    <span class="attr">cancelText</span>: <span class="literal">null</span>,</div><div class="line">    <span class="attr">headerText</span>: <span class="string">'选择车辆'</span>,</div><div class="line">    <span class="attr">onSelect</span>: <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123;</div><div class="line">        <span class="comment">//点击确定触发事件</span></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>　　选项内容 以<code>&lt;select&gt; &lt;option&gt;</code>形式放在html页面中，代码：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"car_select"</span> <span class="attr">data-type</span>=<span class="string">"selectP"</span> <span class="attr">style</span>=<span class="string">"display: none;"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">option</span>&gt;</span></div><div class="line">    　　<span class="tag">&lt;<span class="name">span</span>&gt;</span>轿车 ******<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">option</span>&gt;</span></div><div class="line">    ...</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="2-树形结构选项的滑动选择-treelist"><a href="#2-树形结构选项的滑动选择-treelist" class="headerlink" title="2. 树形结构选项的滑动选择(treelist)"></a>2. 树形结构选项的滑动选择(treelist)</h3><p>　　<img src="http://ovn7viqux.bkt.clouddn.com/blog/mobiscroll/mobiscroll-treelist.png" alt=""><br>　　js代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#'</span> + id).mobiscroll().treelist(&#123;</div><div class="line">    <span class="attr">theme</span>: <span class="string">'android-ics light'</span>,</div><div class="line">    <span class="attr">mode</span>: <span class="string">'scroller'</span>,</div><div class="line">    <span class="attr">display</span>: <span class="string">'bottom'</span>,</div><div class="line">    <span class="attr">lang</span>: <span class="string">'zh'</span>,</div><div class="line">    <span class="attr">labels</span>: [<span class="string">'车辆'</span>],</div><div class="line">    <span class="attr">cancelText</span>: <span class="literal">null</span>,</div><div class="line">    <span class="attr">headerText</span>: <span class="string">'选择车辆'</span>,</div><div class="line">    <span class="attr">formatResult</span>: <span class="function"><span class="keyword">function</span> (<span class="params">array</span>) </span>&#123;</div><div class="line">        <span class="comment">//返回自定义格式结果</span></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>　　选项内容 以<code>&lt;ul&gt; &lt;li&gt;</code>形式放在html页面中，代码：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"car_select"</span> <span class="attr">data-type</span>=<span class="string">"treeList"</span> <span class="attr">style</span>=<span class="string">"display: none;"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">span</span>&gt;</span>宝马X7<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙A 484816<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙A 178123<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙A 789654<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">span</span>&gt;</span>奥迪A8<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙B 999888<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙B 528963<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙B 784511<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">span</span>&gt;</span>奔驰S600<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">ul</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙C 456925<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙C 555555<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">li</span>&gt;</span>浙C 578411<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>　　select，treelist控件显示：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#'</span> + id).mobiscroll(<span class="string">'show'</span>);</div></pre></td></tr></table></figure></p>
+<p>　　隐藏：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#'</span> + id).mobiscroll(<span class="string">'hide'</span>);</div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;　　mobiscroll是个很好用的用于移动端滑动选择的插件，可以用来选择日期，也可以用来选择简单选项或者一些复杂的树形结构的选项，简单分享下。&lt;/p&gt;
+&lt;p&gt;　　依赖也比较简单，引入一个&lt;code&gt;mobiscroll-2.13.2.full.min.js&lt;/code&gt;文
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="jQuery" scheme="https://wangqingkai.github.io/tags/jQuery/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>你不知道的js异步、作用域、闭包</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-asynchrony-scope-closure.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-asynchrony-scope-closure.html</id>
+    <published>2017-03-21T07:13:00.000Z</published>
+    <updated>2017-09-02T05:37:05.285Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】例题如下： for (var i = 0; i &lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &lt; 3; i++) { setTimeout(function <a href="http://www.cnblogs.com/kaidarwang/p/6594457.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】例题如下： for (var i = 0; i &amp;lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &amp;lt; 3; i++
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>js对象的引用和赋值</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-object-reference-assign.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-object-reference-assign.html</id>
+    <published>2017-03-16T05:50:00.000Z</published>
+    <updated>2017-09-08T14:53:51.540Z</updated>
+    
+    <content type="html"><![CDATA[<p>先看一个简单例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> obj = &#123;</div><div class="line">　　<span class="attr">a</span> : <span class="number">1</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> obj1 = obj;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params">b</span>) </span>&#123;</div><div class="line">　　b.a = <span class="number">2</span></div><div class="line">&#125;</div><div class="line">test(obj1);</div><div class="line"><span class="built_in">console</span>.log(obj.a);<span class="comment">//2</span></div></pre></td></tr></table></figure></p>
+<p>在js中对象属于引用类型，<code>var obj1 = obj</code> 这一步相当于把<code>obj</code>的地址赋值给了<code>obj1</code>，它们两个指向的都是原对象的地址，所以通过其中的一个去修改值时其实是修改它们指向的那个对象。上述例子中通过调用test方法改变了原对象的值，因此这里应该输出2。</p>
+<p>对于js的<strong>值类型</strong>和<strong>引用类型</strong>的区分，这里有个通俗的比喻，我们可以用“连锁店”和“总店钥匙”这两个概念来帮助理解。</p>
+<ul>
+<li><p>值类型赋值理解：相当于在一个新的地方按照连锁总店的统一标准（统一店面理解为相同的变量内容）新开一个分店，这样新开的店与总店互不影响、各自运营；</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=<span class="string">'China'</span>;</div><div class="line"><span class="keyword">var</span> b=a;</div><div class="line">a=<span class="string">'USA'</span>;</div><div class="line"><span class="built_in">console</span>.log(b);  <span class="comment">//China</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>引用类型赋值理解：相当于把连锁总店的钥匙（变量引用地址）复制一把给了另外一个老板，此时两个老板同时管理总店，两个老板的行为都有可能对总店的运营造成影响。</p>
+</li>
+</ul>
+<p>正如开篇示例中，引用类型赋值之后修改任何一个对象的值都会影响原对象。注意以下三点：</p>
+<p>1.如果真要复制对象互不影响，则要通过<strong>转换赋值</strong>或者<strong>遍历</strong><code>key:value</code>来复制你的方法和属性。需要注意的是对象的子对象也是引用，所以遍历赋值的时候要判断，子元素是否是对象，如果子元素是对象，则要继续对子元素进行遍历赋值。</p>
+<p>例：转换赋值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> data = &#123;<span class="attr">a</span>:<span class="number">1</span>,<span class="attr">b</span>:<span class="number">2</span>,<span class="attr">c</span>:<span class="number">3</span>,<span class="attr">d</span>:[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]&#125;;</div><div class="line"><span class="keyword">var</span> str = <span class="built_in">JSON</span>.stringify(data);</div><div class="line"><span class="keyword">var</span> data1 = <span class="built_in">JSON</span>.parse(str);</div><div class="line">data1[<span class="string">"e"</span>] = <span class="number">4</span>;</div><div class="line">data1[<span class="string">"d"</span>][<span class="number">0</span>] = <span class="number">11</span>;</div><div class="line"><span class="built_in">console</span>.log(data);<span class="comment">//Object &#123;a: 1, b: 2, c: 3, d: [0,1,2,3]&#125;</span></div><div class="line"><span class="built_in">console</span>.log(data1);<span class="comment">//Object &#123;a: 1, b: 2, c: 3, d: [11,1,2,3], e: 4&#125;</span></div></pre></td></tr></table></figure></p>
+<p>2.当对象引用做为函数<strong>参数传递</strong>时，依然会相互影响，如下示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> data = &#123;<span class="attr">a</span>:<span class="number">1</span>,<span class="attr">b</span>:<span class="number">2</span>,<span class="attr">c</span>:<span class="number">3</span>,<span class="attr">d</span>:&#123;<span class="attr">q</span>:<span class="number">4</span>,<span class="attr">w</span>:<span class="number">5</span>,<span class="attr">e</span>:<span class="number">6</span>&#125;&#125;;</div><div class="line"><span class="keyword">var</span> data1 = data;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">con</span>(<span class="params">data2</span>)</span>&#123;</div><div class="line">　　data2[<span class="string">"r"</span>] = <span class="number">5</span>;</div><div class="line">　　<span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data2));</div><div class="line">&#125;</div><div class="line">con(data1);<span class="comment">//&#123;"a":1,"b":2,"c":3,"d":&#123;"q":4,"w":5,"e":6&#125;,"r":5&#125;</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(data));<span class="comment">//&#123;"a":1,"b":2,"c":3,"d":&#123;"q":4,"w":5,"e":6&#125;,"r":5&#125;</span></div></pre></td></tr></table></figure>
+<p>3.但是，对象引用赋值后，如果将对象<strong>置空</strong>，相互间是不受影响的，如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> arr = &#123;<span class="string">"a"</span>:<span class="string">"1"</span>,<span class="string">"b"</span>:<span class="string">"2"</span>&#125;;</div><div class="line"><span class="keyword">var</span> arr1 = arr;</div><div class="line">arr = &#123;&#125;;</div><div class="line">arr[<span class="string">"a"</span>] = <span class="number">2</span>;</div><div class="line"><span class="built_in">console</span>.log(arr1);<span class="comment">//Object &#123;a: "1", b: "2"&#125;</span></div><div class="line"><span class="built_in">console</span>.log(arr);<span class="comment">//Object &#123;a: 2&#125;</span></div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;先看一个简单例子：&lt;br&gt;&lt;figure class=&quot;highlight javascript&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;d
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>js中的slice,splice和split</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-slice-splice-split.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-slice-splice-split.html</id>
+    <published>2017-03-15T07:02:00.000Z</published>
+    <updated>2017-09-02T05:35:45.956Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】1.slice（数组） 用法：array.slice(start,end) 解释：该方法是对数组进行部分截取，并返回一个数组副本；参数start是截取的开始数组索引，end参数等于你要取的最后一个字符的位置值加上1（可选） ? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  <a href="http://www.cnblogs.com/kaidarwang/p/6554275.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】1.slice（数组） 用法：array.slice(start,end) 解释：该方法是对数组进行部分截取，并返回一个数组副本；参数start是截取的开始数组索引，end参数等于你要取的最后一个字符的位置值加上1（可选） ? 1 2 3 4 5 6 7 8 9 1
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android 截屏检测</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/android-screenshot-detection.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/android-screenshot-detection.html</id>
+    <published>2017-03-09T07:22:00.000Z</published>
+    <updated>2017-09-02T05:32:30.604Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】最近项目中新接到一个需求，对手机截屏进行检测并进行后续操作，类似于Snapchat，iOS具有先天优势，因iOS系统提供了相关API！Google无果之后原作者决定再次造轮子，为了持续表达对Rx的敬意，命名为RxScreenshotDetector， github 源码地址 。 效果有图有真相 原理 <a href="http://www.cnblogs.com/kaidarwang/p/6525878.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】最近项目中新接到一个需求，对手机截屏进行检测并进行后续操作，类似于Snapchat，iOS具有先天优势，因iOS系统提供了相关API！Google无果之后原作者决定再次造轮子，为了持续表达对Rx的敬意，命名为RxScreenshotDetector， github 
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="Android" scheme="https://wangqingkai.github.io/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>js数组的sort排序详解</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/js-sort-explain.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/js-sort-explain.html</id>
+    <published>2017-02-28T06:57:00.000Z</published>
+    <updated>2017-09-02T14:03:26.613Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】<body> <div> sort()对数组排序，不开辟新的内存，对原有数组元素进行调换 </div> <div id="showBox"> 1、简单数组简单排序  var arrSimple=new Array(1,8,7,6); arrSimple.sort(); <a href="http://www.cnblogs.com/kaidarwang/p/6478896.html" target="_blank" rel="external">阅读全文</a></div></body></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】&lt;body&gt; &lt;div&gt; sort()对数组排序，不开辟新的内存，对原有数组元素进行调换 &lt;/div&gt; &lt;div id=&quot;showBox&quot;&gt; 1、简单数组简单排序  var arrSimple=new Array(1,8,7,6); arrSimple.sort()
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>jQuery诞生记-原理与机制</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/jquery-birth-notes.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/jquery-birth-notes.html</id>
+    <published>2017-02-24T02:17:00.000Z</published>
+    <updated>2017-09-08T15:38:26.712Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】一、看似偶然的东西实际是必然会发生的 我大学时候在图书馆翻过一本很破旧的书，讲生物理论的，主要内容就是探讨生命的产生是偶然还是必然。里面很多亚里士多德都看不懂的公式计算什么的，还有模拟原始地球环境出现了有机物的实验什么的 。总之，书论述的观点是：“在当时的地球环境下，生命的产生是必然的！” 无数次机 <a href="http://www.cnblogs.com/kaidarwang/p/6437364.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】一、看似偶然的东西实际是必然会发生的 我大学时候在图书馆翻过一本很破旧的书，讲生物理论的，主要内容就是探讨生命的产生是偶然还是必然。里面很多亚里士多德都看不懂的公式计算什么的，还有模拟原始地球环境出现了有机物的实验什么的 。总之，书论述的观点是：“在当时的地球环境下
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="jQuery" scheme="https://wangqingkai.github.io/tags/jQuery/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>你所不知的 CSS ::before 和 ::after 伪元素用法</title>
+    <link href="https://wangqingkai.github.io/blogs/programming/css-pseudo-class-before-after.html"/>
+    <id>https://wangqingkai.github.io/blogs/programming/css-pseudo-class-before-after.html</id>
+    <published>2017-02-20T05:40:00.000Z</published>
+    <updated>2017-09-08T15:37:01.312Z</updated>
+    
+    <content type="html"><![CDATA[<p>【摘要】CSS 有两个说不上常用的伪类 :before 和 :after，偶尔会被人用来添加些自定义格式什么的，但是它们的功用不仅于此。前几天发现了 Creative Link Effects 这个非常有意思的介绍创意链接特效的页面，里面惊人的效果大量使用到的特性除了 transform 属性进行变形之外 <a href="http://www.cnblogs.com/kaidarwang/p/6419157.html" target="_blank" rel="external">阅读全文</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;【摘要】CSS 有两个说不上常用的伪类 :before 和 :after，偶尔会被人用来添加些自定义格式什么的，但是它们的功用不仅于此。前几天发现了 Creative Link Effects 这个非常有意思的介绍创意链接特效的页面，里面惊人的效果大量使用到的特性除了 tr
+    
+    </summary>
+    
+      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
+    
+    
+      <category term="CSS" scheme="https://wangqingkai.github.io/tags/CSS/"/>
+    
+  </entry>
+  
+</feed>

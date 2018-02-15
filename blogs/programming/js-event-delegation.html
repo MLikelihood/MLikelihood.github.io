@@ -1,0 +1,405 @@
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="baidu-site-verification" content="TlEP03OoJ1" />
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="冷泉">
+  
+  
+  
+  
+    <meta name="description" content="事件代理，又称事件委托（Delegation），就是将处理事件委派到父元素或者顶级元素上，利用事件的冒泡机制，管理某一类型元素上的所有事件。
+要理解这个概念，必须先对事件模型有个初步的了解。W3C定义的DOM2.0标准事件模型分为三个阶段：
+
+
+捕获阶段
+目标阶段
+冒泡阶段
+
+
+捕获阶段：当某个元素触发事件时，顶层对象document会发出一个事件流，随着DOM树向着目标元素流去直到到达目标...">
+  
+  
+  <title> 什么是事件代理？DOM2.0标准事件模型的三个阶段 | Kwin's Blog </title>
+  
+  <title> Kwin's Blog </title>
+  
+    <link rel="alternate" href="/atom.xml" title="Kwin's Blog">
+  
+  
+    <link rel="shortcut icon" href="http://files.cnblogs.com/files/kaidarwang/k.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?6527bfe8d5e773154b0da901dd588d14";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  <script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+  
+    <div class="item next">
+      <a href="/blogs/programming/symmetric-encryption-des-js-java.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        对称加密——对入参进行DES加密处理
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onClick="openUserCard()">
+          <img id="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400"/>
+          <div id="homelink">Kwin's Blog</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/index.html">Home</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">Archives</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">About</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/wangqingkai">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>什么是事件代理？DOM2.0标准事件模型的三个阶段</h1>
+    <p class="page-title-sub">
+      <span id = "post-title-date">Created at 2017-10-29</span>
+      
+
+      
+      
+      <span id = "post-title-categories">Category
+      
+      
+        
+        
+        <a href="/categories/programming/">programming</a>
+      
+      </span>
+      
+      
+      <span id = "post-title-tags">
+      Tag
+      
+      
+        
+        
+        <a href="/tags/JavaScript/">JavaScript</a>
+      
+      </span>
+      
+      <span id="busuanzi_container_page_pv">
+        <span id="busuanzi_value_page_pv" style="margin-right: 0;"></span> times read
+      </span>
+    </p>
+    
+    <p>事件代理，又称事件委托（Delegation），就是将处理事件委派到父元素或者顶级元素上，利用事件的冒泡机制，管理某一类型元素上的所有事件。</p>
+<p>要理解这个概念，必须先对事件模型有个初步的了解。W3C定义的DOM2.0标准事件模型分为三个阶段：</p>
+<blockquote>
+<ol>
+<li>捕获阶段</li>
+<li>目标阶段</li>
+<li>冒泡阶段</li>
+</ol>
+</blockquote>
+<p><strong>捕获阶段</strong>：当某个元素触发事件时，顶层对象document会发出一个事件流，随着DOM树向着目标元素流去直到到达目标元素，途径的元素如果绑定了事件，在这个阶段是不会执行的；<br><strong>目标阶段</strong>：事件流找到了目标元素，执行目标元素相应的处理函数，如果没有绑定任何事件，则不执行；<br><strong>冒泡阶段</strong>：事件流从目标元素向顶层元素折回，遇到绑定事件，即执行（该阶段在IE6中不存在）；</p>
+<p>因此我们发现，在元素绑定事件时，完全可以绑定在该元素的任一上级元素上再进行事件处理即可。那么，事件代理具体怎么应用呢？</p>
+<p>例如，页面中有这样一个无序列表，需要给每个<code>li</code>添加点击事件，弹出相应内容，如果我们通过for循环为每个<code>li</code>单独绑定click事件，由于元素数量过多无疑会造成网页性能下降，有内存泄露的风险。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">ul</span> <span class="attr">id</span>=<span class="string">"ul-test"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-1"</span>&gt;</span>11<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-2"</span>&gt;</span>22<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-3"</span>&gt;</span>33<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-4"</span>&gt;</span>44<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">id</span>=<span class="string">"li-5"</span>&gt;</span>55<span class="tag">&lt;/<span class="name">li</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>如果将click事件绑定在<code>ul</code>元素上，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">　　<span class="keyword">var</span> ulEle = <span class="built_in">document</span>.getElementById(<span class="string">"ul-test"</span>);</div><div class="line">　　ulEle.onclick = <span class="function"><span class="keyword">function</span>(<span class="params">ev</span>)</span>&#123;</div><div class="line">　　　　<span class="keyword">var</span> ev = ev || <span class="built_in">window</span>.event;</div><div class="line">　　　　<span class="keyword">var</span> target = ev.target || ev.srcElement;</div><div class="line">　　　　<span class="keyword">if</span>(target.nodeName.toLowerCase() == <span class="string">'li'</span>)&#123;</div><div class="line">　　　　　　alert(target.innerHTML);</div><div class="line">　　　　　　<span class="keyword">if</span>(target.id == <span class="string">'li-3'</span>)&#123;</div><div class="line">　　　　　　   alert(<span class="string">'click li-3'</span>); </div><div class="line">　　　　　　&#125;</div><div class="line">　　　　&#125;</div><div class="line">　　&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上述代码中，我们只需要绑定一次事件，通过Event对象的target属性返回事件源（即事件的目标节点），可以做不同的处理，这就是事件代理，原本需要目标元素处理的事件，交由其父元素代为执行。采用事件代理避免了频繁的操作DOM，优化效果可想而知。</p>
+<p>以上只是对事件代理的基本认识和应用，更深层次应用有待挖掘。</p>
+
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">Show TOC</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">Hide TOC</button>
+  <div class="random-toc">
+    <h2>Table of Content</h2>
+    
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+
+  
+
+  
+    <a href="/blogs/programming/symmetric-encryption-des-js-java.html" class="next">Next post 对称加密——对入参进行DES加密处理 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+      
+      <div id="uyan_frame"></div>
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      <p>
+      &copy; 冷泉
+      
+        Since
+        
+
+        2017
+        
+         - 2018
+        
+      
+      </p>
+      <p>
+      <span id="busuanzi_container_site_pv">
+          Total <span id="busuanzi_value_site_pv"></span> times visits.
+      </span>
+      <span id="busuanzi_container_site_uv">
+          <span id="busuanzi_value_site_uv"></span> visitors.
+      </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400">
+    <p id="description">Kwin's Blog | 个人网站</p>
+    <ul class="social-icon">
+  
+  
+</ul>
+  </div>
+</div>
+
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":28};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<script>
+    $(document).ready(function() {
+        var int_pv = setInterval(fixPvCount, 100);
+        var int_uv = setInterval(fixUvCount, 100);
+        var busuanziSetPv = parseInt(1264);
+        var busuanziSetUv = parseInt(509);
+        function fixPvCount() {
+            if ($("#busuanzi_value_site_pv").html()) {
+                clearInterval(int_pv);
+                $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + busuanziSetPv);
+            }
+        }
+        function fixUvCount() {
+            if ($("#busuanzi_value_site_uv").html()) {
+                clearInterval(int_uv);
+                $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + busuanziSetUv);
+            }
+        }
+    });
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1264474832'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1264474832' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>
+

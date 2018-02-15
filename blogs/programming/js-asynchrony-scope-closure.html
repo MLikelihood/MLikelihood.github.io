@@ -18,8 +18,10 @@
   
   
   
-    <meta name="description" content="Kwin's Blog | 个人网站">
+    <meta name="description" content="【摘要】例题如下： for (var i = 0; i &lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &lt; 3; i++) { setTimeout(function 阅读全文">
   
+  
+  <title> 你不知道的js异步、作用域、闭包 | Kwin's Blog </title>
   
   <title> Kwin's Blog </title>
   
@@ -62,44 +64,190 @@
   </script>
 </head>
 
-<div class="random-center hide-area">
-  <div id="random-index">
-    <div class="center-field">
-      <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400" width=120 height=120 onClick="openUserCard()">
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/blogs/programming/jquery-mobiscroll-select-treeList.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        利用jquery mobiscroll插件选择日期、select、treeList的具体运用
+      </div>
     </div>
-    <div class="center-field">
-      <div class="title" onClick="openUserCard()">冷泉</div>
-      <div class="sub-title" onClick="openUserCard()">心向往之，行必能至</div>
-    </div>
-    <hr >
-    <div class="center-field">
-      <ul class="index-nav-link">
-        
-        
-          
-            <li><a href="/index.html">Home</a></li>
-          
-        
-          
-            <li><a href="/archives">Archives</a></li>
-          
-        
-          
-            <li><a href="/about">About</a></li>
-          
-        
-          
-            <li><a href="https://github.com/wangqingkai">Github</a></li>
-          
-        
-      </ul>
-      <ul class="social-icon">
   
   
-</ul>
+    <div class="item next">
+      <a href="/blogs/programming/js-object-reference-assign.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        js对象的引用和赋值
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onClick="openUserCard()">
+          <img id="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400"/>
+          <div id="homelink">Kwin's Blog</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/index.html">Home</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">Archives</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">About</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/wangqingkai">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>你不知道的js异步、作用域、闭包</h1>
+    <p class="page-title-sub">
+      <span id = "post-title-date">Created at 2017-03-21</span>
+      
+
+      
+      
+      <span id = "post-title-categories">Category
+      
+      
+        
+        
+        <a href="/categories/programming/">programming</a>
+      
+      </span>
+      
+      
+      <span id = "post-title-tags">
+      Tag
+      
+      
+        
+        
+        <a href="/tags/JavaScript/">JavaScript</a>
+      
+      </span>
+      
+      <span id="busuanzi_container_page_pv">
+        <span id="busuanzi_value_page_pv" style="margin-right: 0;"></span> times read
+      </span>
+    </p>
+    
+    <p>【摘要】例题如下： for (var i = 0; i &lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &lt; 3; i++) { setTimeout(function <a href="http://www.cnblogs.com/kaidarwang/p/6594457.html" target="_blank" rel="external">阅读全文</a></p>
+
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">Show TOC</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">Hide TOC</button>
+  <div class="random-toc">
+    <h2>Table of Content</h2>
+    
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/blogs/programming/jquery-mobiscroll-select-treeList.html" class="prev">&larr; Prev post 利用jquery mobiscroll插件选择日期、select、treeList的具体运用</a>
+  
+
+  
+
+  
+    <a href="/blogs/programming/js-object-reference-assign.html" class="next">Next post js对象的引用和赋值 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+      
+      <div id="uyan_frame"></div>
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      <p>
+      &copy; 冷泉
+      
+        Since
+        
+
+        2017
+        
+         - 2018
+        
+      
+      </p>
+      <p>
+      <span id="busuanzi_container_site_pv">
+          Total <span id="busuanzi_value_site_pv"></span> times visits.
+      </span>
+      <span id="busuanzi_container_site_uv">
+          <span id="busuanzi_value_site_uv"></span> visitors.
+      </span>
+      </p>
     </div>
   </div>
 </div>
+
+</div>
+
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
 <div id="user-card">
   <div class="center-field">
     <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400">
@@ -172,6 +320,8 @@ var unsplashConfig = {"gravity":"north"};
 var turnoffBackgroundImage = false;
 
 
+
+  turnoffBackgroundImage = true;
 
 
 var backgroundColor = "34495E";

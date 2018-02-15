@@ -1,0 +1,398 @@
+
+
+
+
+
+
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="baidu-site-verification" content="TlEP03OoJ1" />
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="author" content="冷泉">
+  
+  
+  
+  
+    <meta name="description" content="之前就遇到过需要前端支持用户输入并提交emoji表情的问题，一直没有着手解决，今天再一次狭路相逢，该来的躲不过，那就尝试去解决吧。
+　　大多数emoji表情都是4字节的utf-16编码（为辅助平面字符，另有少部分表情属于2字节的基本平面字符），而我们的MySQL数据库采用utf-8，并且最大允许3字节的字符，因此前端提交由用户输入的4字节的emoji表情在存入数据库时会报错。在后台不动的情况...">
+  
+  
+  <title> 手机自带输入法输入的emoji表情如何提交后台保存数据库 | Kwin's Blog </title>
+  
+  <title> Kwin's Blog </title>
+  
+    <link rel="alternate" href="/atom.xml" title="Kwin's Blog">
+  
+  
+    <link rel="shortcut icon" href="http://files.cnblogs.com/files/kaidarwang/k.ico">
+  
+  
+  <link rel="stylesheet" href="/css/random.css">
+<link rel="stylesheet" href="/css/vegas.min.css">
+<link rel="stylesheet" href="/css/highlight-railscasts.css">
+<link rel="stylesheet" href="/css/jquery.fancybox.css">
+<link rel="stylesheet" href="/css/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/jquery.fancybox-thumbs.css">
+<link rel="stylesheet" href="/css/plyr.css">
+  
+  <script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?6527bfe8d5e773154b0da901dd588d14";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  <script>
+  (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+          bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else {
+          bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+  })();
+  </script>
+</head>
+
+<body>
+<div class="side-navigate hide-area">
+  
+    <div class="item prev">
+      <a href="/blogs/other/hexo-github-build-blog.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        Hexo+Github/Coding免费搭建个人博客网站
+      </div>
+    </div>
+  
+  
+    <div class="item next">
+      <a href="/blogs/programming/js-this-call-apply-bind.html">
+        <div class="item-icon"></div>
+      </a>
+      <div class="item-title">
+        改变函数中的 this 指向——神奇的call,apply和bind及其应用
+      </div>
+    </div>
+  
+</div>
+<div id="outer-container" class="hide-area">
+<div id="container">
+  <div id="menu-outer" class="slide-down">
+    <div id="menu-inner">
+      <div id="brand">
+        
+        <a onClick="openUserCard()">
+          <img id="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400"/>
+          <div id="homelink">Kwin's Blog</div>
+        </a>
+      </div>
+      <div id="menu-list">
+        <ul>
+        
+        
+          
+            <li>
+          
+            <a href="/index.html">Home</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/archives">Archives</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="/about">About</a>
+            
+          </li>
+        
+          
+            <li>
+          
+            <a href="https://github.com/wangqingkai">Github</a>
+            
+          </li>
+        
+        </ul>
+      </div>
+      <div id="show-menu">
+        <button>Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-outer">
+    <div id="content-inner">
+      
+      
+  <article id="post">
+    <h1>手机自带输入法输入的emoji表情如何提交后台保存数据库</h1>
+    <p class="page-title-sub">
+      <span id = "post-title-date">Created at 2017-08-31</span>
+      
+
+      
+      
+      <span id = "post-title-categories">Category
+      
+      
+        
+        
+        <a href="/categories/programming/">programming</a>
+      
+      </span>
+      
+      
+      <span id = "post-title-tags">
+      Tag
+      
+      
+        
+        
+        <a href="/tags/JavaScript/">JavaScript</a>
+      
+      </span>
+      
+      <span id="busuanzi_container_page_pv">
+        <span id="busuanzi_value_page_pv" style="margin-right: 0;"></span> times read
+      </span>
+    </p>
+    
+    <p>　　之前就遇到过需要前端支持用户输入并提交emoji表情的问题，一直没有着手解决，今天再一次狭路相逢，该来的躲不过，那就尝试去解决吧。</p>
+<p>　　大多数emoji表情都是<strong>4字节</strong>的<strong>utf-16</strong>编码（为辅助平面字符，另有少部分表情属于2字节的基本平面字符），而我们的MySQL数据库采用utf-8，并且最大允许<strong>3字节</strong>的字符，因此前端提交由用户输入的4字节的emoji表情在存入数据库时会报错。在后台不动的情况下，有一种解决方案就是前端进行处理，将emoji表情转换为<strong>字符实体</strong>再提交。<br>　　<br><img src="http://ovn7viqux.bkt.clouddn.com/emoji-code.png" alt=""><br>　　<br>　　这是一张Unicode字符百科的截图，前三个是2字节的基本平面字符，之后的是4字节的辅助平面字符，例如Grinning Face，<img src="http://ovn7viqux.bkt.clouddn.com/emoji-code-1.png" alt="">是它的utf-16的编码，<img src="http://ovn7viqux.bkt.clouddn.com/emoji-code-2.png" alt="">就是它的字符实体，这一类也就是我们要进行处理的一类。</p>
+<p>　　我们要将这一类emoji表情转为字符实体存入数据库，首先要进行字符检测，这里要用到正则表达式，由于JavaScript采用ucs-2编码，所有字符在JavaScript中都是2字节，所以4字节的emoji表情会被当做两个双字节字符处理，这里有个高位（H）和低位（L）的概念（有兴趣请阅读阮一峰老师<a href="http://www.ruanyifeng.com/blog/2014/12/unicode.html" target="_blank" rel="external">一篇文章</a>），所以我们检测4字节emoji表情的正则表达式应该是：<code>/[\ud800-\udbff][\udc00-\udfff]/g</code>。</p>
+<p><img src="http://ovn7viqux.bkt.clouddn.com/uncode-formula.png" alt=""></p>
+<p>　　阮老师文章中提到了utf-16转ucs-2(unicode)的公式，我们需要进行反推来转换成我们需要的ucs-2编码。这里是Demo中的一个处理函数供参考：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">utf16toEntities: <span class="function"><span class="keyword">function</span>(<span class="params">str</span>) </span>&#123; <span class="comment">//检测utf16emoji表情 转换为实体字符以供后台存储</span></div><div class="line">    <span class="keyword">var</span> patt=<span class="regexp">/[\ud800-\udbff][\udc00-\udfff]/g</span>;</div><div class="line">    str = str.replace(patt, <span class="function"><span class="keyword">function</span>(<span class="params">char</span>)</span>&#123;</div><div class="line">        <span class="keyword">var</span> H, L, code;</div><div class="line">        <span class="keyword">if</span> (char.length===<span class="number">2</span>) &#123;   <span class="comment">//辅助平面字符（我们需要做处理的一类）</span></div><div class="line">            H = char.charCodeAt(<span class="number">0</span>); <span class="comment">// 取出高位</span></div><div class="line">            L = char.charCodeAt(<span class="number">1</span>); <span class="comment">// 取出低位</span></div><div class="line">            code = (H - <span class="number">0xD800</span>) * <span class="number">0x400</span> + <span class="number">0x10000</span> + L - <span class="number">0xDC00</span>; <span class="comment">// 转换算法</span></div><div class="line">            <span class="keyword">return</span> <span class="string">"&amp;#"</span> + code + <span class="string">";"</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> char;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> str;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　经过上述转换，我们手机端输入的emoji表情应该就可以提交到数据库了，but…解决问题往往不会这么一帆风顺，我们发现正常保存的emoji表情在页面上不能正常显示，我们前端采用angular开发，用&#123;&#123;&#125;&#125;将包含emoji字符实体的字符串渲染到页面上时显示的直接是这样<img src="http://ovn7viqux.bkt.clouddn.com/128514.png" alt="">的字符实体，审查元素发现HTML内容是这样<img src="http://ovn7viqux.bkt.clouddn.com/ub-html-code.png" alt="">，一时还不知道原因是什么，但一定是用&#123;&#123;&#125;&#125;渲染有问题，尝试换用ng-bind-html，<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"bloodPressureRemarks text-left ellipsis"</span> <span class="attr">ng-bind-html</span>=<span class="string">"item.remarks"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>　　问题解决！</p>
+
+  </article>
+  <div class="random-toc-area">
+  <button class="btn-hide-toc btn-hide-toc-show" style="display: none" onclick="TOCToggle()">Show TOC</button>
+  <button class="btn-hide-toc btn-hide-toc-hide" onclick="TOCToggle()">Hide TOC</button>
+  <div class="random-toc">
+    <h2>Table of Content</h2>
+    
+  </div>
+</div>
+
+  
+<nav id="pagination">
+  
+    <a href="/blogs/other/hexo-github-build-blog.html" class="prev">&larr; Prev post Hexo+Github/Coding免费搭建个人博客网站</a>
+  
+
+  
+
+  
+    <a href="/blogs/programming/js-this-call-apply-bind.html" class="next">Next post 改变函数中的 this 指向——神奇的call,apply和bind及其应用 &rarr;</a>
+  
+</nav>
+
+  <!-- JiaThis Button BEGIN -->
+
+<!-- JiaThis Button END -->
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+      
+      <div id="uyan_frame"></div>
+      
+      
+    </div>
+  </div>
+
+  <div id="bottom-outer">
+    <div id="bottom-inner">
+      <p>
+      &copy; 冷泉
+      
+        Since
+        
+
+        2017
+        
+         - 2018
+        
+      
+      </p>
+      <p>
+      <span id="busuanzi_container_site_pv">
+          Total <span id="busuanzi_value_site_pv"></span> times visits.
+      </span>
+      <span id="busuanzi_container_site_uv">
+          <span id="busuanzi_value_site_uv"></span> visitors.
+      </span>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+  <!-- UY BEGIN -->
+<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=2142330"></script>
+<!-- UY END -->
+
+<div id="user-card">
+  <div class="center-field">
+    <img class="avatar" src="https://avatars2.githubusercontent.com/u/18696320?v=3&u=9d075de6a3ca43cc43c7f9414a2546f6975c803c&s=400">
+    <p id="description">Kwin's Blog | 个人网站</p>
+    <ul class="social-icon">
+  
+  
+</ul>
+  </div>
+</div>
+
+
+<script>
+// is trigger analytics / tongji script
+var isIgnoreHost = false;
+
+if(window && window.location && window.location.host) {
+  isIgnoreHost = ["localhost","127.0.0.1"].some(function(address){
+    return 0 === window.location.host.indexOf(address);
+  });
+}
+
+var isTriggerAnalytics = !( true && isIgnoreHost );
+
+</script>
+
+
+
+
+  
+  
+    <script src="/js/jquery-2.2.3.min.js"></script>
+  
+    <script src="/js/vegas.min.js"></script>
+  
+    <script src="/js/random.js"></script>
+  
+    <script src="/js/highlight.pack.js"></script>
+  
+    <script src="/js/jquery.mousewheel.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox.pack.js"></script>
+  
+    <script src="/js/jquery.fancybox-thumbs.js"></script>
+  
+    <script src="/js/plyr.js"></script>
+  
+
+<script>
+
+  // fancybox
+  var backgroundImages = [];
+  
+  $('#post').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox') || $(this).parent().hasClass('fancybox-thumb')) return;
+      var alt = this.alt || this.title;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'post' + i);
+    });
+  });
+  $(".fancybox").fancybox();
+
+var vegasConfig = {"preload­Image":true,"transition":["slideLeft2","slideRight2","flash2"],"timer":true,"delay":5000,"shuffle":true,"count":28};
+var unsplashConfig = {"gravity":"north"};
+// is show background images
+var turnoffBackgroundImage = false;
+
+
+
+  turnoffBackgroundImage = true;
+
+
+var backgroundColor = "34495E";
+
+$(".fancybox-thumb").fancybox({
+  prevEffect: 'none',
+  nextEffect: 'none',
+  helpers: {
+    title: {
+      type: 'outside'
+    },
+    thumbs: {
+      width: 50,
+      height: 50
+    }
+  }
+});
+
+// show video with plyr
+$(".video-container iframe").each(function(i){
+  var url = $(this).attr('src');
+  var id = url.split('/').pop();
+  var plyrContainer = document.createElement('div');
+  plyrContainer.className = 'plyr';
+  var plyrElement = document.createElement('div');
+  plyrElement.dataset.videoId = id;
+  switch(true) {
+    case url.search('youtube.com') >= 0:
+      plyrElement.dataset.type = 'youtube';
+      break;
+    case url.search('vimeo.com') >= 0:
+      plyrElement.dataset.type = 'vimeo';
+      break;
+    default:
+      return;
+  };
+  plyrContainer.appendChild(plyrElement);
+  $(this).parent().html(plyrContainer);
+});
+plyr.setup('.plyr', {iconUrl: '/css/sprite.svg'});
+</script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<script>
+    $(document).ready(function() {
+        var int_pv = setInterval(fixPvCount, 100);
+        var int_uv = setInterval(fixUvCount, 100);
+        var busuanziSetPv = parseInt(1264);
+        var busuanziSetUv = parseInt(509);
+        function fixPvCount() {
+            if ($("#busuanzi_value_site_pv").html()) {
+                clearInterval(int_pv);
+                $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + busuanziSetPv);
+            }
+        }
+        function fixUvCount() {
+            if ($("#busuanzi_value_site_uv").html()) {
+                clearInterval(int_uv);
+                $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + busuanziSetUv);
+            }
+        }
+    });
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1264474832'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1264474832' type='text/javascript'%3E%3C/script%3E"));</script>
+</body>
+</html>
+
