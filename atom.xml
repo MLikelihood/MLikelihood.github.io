@@ -102,7 +102,7 @@
     <published>2017-09-12T14:18:09.000Z</published>
     <updated>2017-10-04T07:18:38.948Z</updated>
     
-    <content type="html"><![CDATA[<p>很早之前就想搭建一个属于自己的博客网站，一方面是给自己做笔记，把平时遇到的问题和解决问题的方式方法记录下来，顺便提升自己的表达能力、总结能力；另一方面，个人博客就像是自己在网络世界中的一个小家，一个完全属于自己的空间，你可以在这里尽情发挥，别人可以通过它来了解你。前段时间偶然间发现了Hexo，看了两天<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">官方文档</a>，参考网上教程，搭建了自己的个人网站：<a href="http://vblog.win/" target="_blank" rel="external">http://vblog.win/</a> 欢迎访问！搭建完毕在此记录一下搭建过程。</p>
+    <content type="html"><![CDATA[<p>很早之前就想搭建一个属于自己的博客网站，一方面是给自己做笔记，把平时遇到的问题和解决问题的方式方法记录下来，顺便提升自己的表达能力、总结能力；另一方面，个人博客就像是自己在网络世界中的一个小家，一个完全属于自己的空间，你可以在这里尽情发挥，别人可以通过它来了解你。前段时间偶然间发现了Hexo，看了两天<a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="external">官方文档</a>，参考网上教程，记录一下搭建过程。</p>
 <h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1. 环境准备"></a>1. 环境准备</h2><h3 id="1-1-node-js安装和准备"><a href="#1-1-node-js安装和准备" class="headerlink" title="1.1 node.js安装和准备"></a>1.1 node.js安装和准备</h3><p>在node.js官网 <a href="http://nodejs.cn/download/" target="_blank" rel="external">http://nodejs.cn/download/</a> 下载对应安装文件，保持默认设置，一路next，安装结束。<br>打开命令提示符，输入<code>node -v</code>，<code>npm -v</code>输出当前版本号说明node环境搭建完成。</p>
 <p><img src="http://ovn7viqux.bkt.clouddn.com/blog/hexoBlog/cmd-node-version.png" alt=""></p>
 <h3 id="1-2-git安装和准备"><a href="#1-2-git安装和准备" class="headerlink" title="1.2 git安装和准备"></a>1.2 git安装和准备</h3><p>在Git官网 <a href="https://git-scm.com/downloads" target="_blank" rel="external">https://git-scm.com/downloads</a> （如未翻墙下载过慢可参考<a href="https://github.com/waylau/git-for-win" target="_blank" rel="external">地址</a>）下载对应安装文件，保持默认设置一路next也没毛病，这里一点提醒，Git出于安全考虑，只能在<code>Git Bash</code>中进行Git有关的命令操作，如果想要在命令提示符中使用Git命令，在安装过程中调整PATH环境一步需勾选第二项，这样Git安装程序会在系统PATH中设置Git路径，以便于我们在命令提示符中直接使用Git命令（尽管可以这样设置，但还是建议都在Git Bash中输入命令）。</p>
@@ -194,52 +194,8 @@
       <category term="JavaScript" scheme="https://MLikelihood.github.io/tags/JavaScript/"/>
     
   </entry>
+
   
-  <entry>
-    <title>改变函数中的 this 指向——神奇的call,apply和bind及其应用</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/js-this-call-apply-bind.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/js-this-call-apply-bind.html</id>
-    <published>2017-06-29T02:18:00.000Z</published>
-    <updated>2017-09-02T05:36:08.778Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】在JavaScript 中，call、apply 和 bind 是 Function 对象自带的三个方法，这三个方法的主要作用是改变函数中的 this 指向，从而可以达到<code>接花移木</code>的效果。本文将对这三个方法进行详细的讲解，并列出几个经典应用场景。 1、call(thisArgs [,args… <a href="http://www.cnblogs.com/kaidarwang/p/7093055.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】在JavaScript 中，call、apply 和 bind 是 Function 对象自带的三个方法，这三个方法的主要作用是改变函数中的 this 指向，从而可以达到&lt;code&gt;接花移木&lt;/code&gt;的效果。本文将对这三个方法进行详细的讲解，并列出几个经典应用场
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="JavaScript" scheme="https://MLikelihood.github.io/tags/JavaScript/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>什么是jsonp？——使用jsonp解决跨域请求问题</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/jsonp-cross-domain.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/jsonp-cross-domain.html</id>
-    <published>2017-06-15T08:38:00.000Z</published>
-    <updated>2017-09-02T05:37:22.013Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】我们在使用ajax请求的时候经常会产生跨域问题，这是由于浏览器的同源策略导致的。所谓同源，即域名、协议、端口均相同，否则不管是静态页面还是动态网页或者web服务都无法通过ajax正常请求。有时候，我们可以通过jsonp来解决。 jsonp的数据传输方式是利用了 script标签src属性中的链接可以 <a href="http://www.cnblogs.com/kaidarwang/p/7018622.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】我们在使用ajax请求的时候经常会产生跨域问题，这是由于浏览器的同源策略导致的。所谓同源，即域名、协议、端口均相同，否则不管是静态页面还是动态网页或者web服务都无法通过ajax正常请求。有时候，我们可以通过jsonp来解决。 jsonp的数据传输方式是利用了 sc
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="jsonp" scheme="https://MLikelihood.github.io/tags/jsonp/"/>
-    
-  </entry>
   
   <entry>
     <title>玩转angularJs——通过自定义ng-model，不仅仅只是input可以实现双向数据绑定</title>
@@ -302,28 +258,7 @@
     
   </entry>
   
-  <entry>
-    <title>你不知道的js异步、作用域、闭包</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/js-asynchrony-scope-closure.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/js-asynchrony-scope-closure.html</id>
-    <published>2017-03-21T07:13:00.000Z</published>
-    <updated>2017-09-02T05:37:05.285Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】例题如下： for (var i = 0; i &lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &lt; 3; i++) { setTimeout(function <a href="http://www.cnblogs.com/kaidarwang/p/6594457.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】例题如下： for (var i = 0; i &amp;lt; 3; i++) { setTimeout(function() { console.log(i); }, 0); console.log(i); } for (var i = 0; i &amp;lt; 3; i++
-    
-    </summary>
-    
-      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
-    
-    
-      <category term="JavaScript" scheme="https://MLikelihood.github.io/tags/JavaScript/"/>
-    
-  </entry>
+  
   
   <entry>
     <title>js对象的引用和赋值</title>
@@ -363,119 +298,12 @@
     
   </entry>
   
-  <entry>
-    <title>js中的slice,splice和split</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/js-slice-splice-split.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/js-slice-splice-split.html</id>
-    <published>2017-03-15T07:02:00.000Z</published>
-    <updated>2017-09-02T05:35:45.956Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】1.slice（数组） 用法：array.slice(start,end) 解释：该方法是对数组进行部分截取，并返回一个数组副本；参数start是截取的开始数组索引，end参数等于你要取的最后一个字符的位置值加上1（可选） ? 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15  <a href="http://www.cnblogs.com/kaidarwang/p/6554275.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】1.slice（数组） 用法：array.slice(start,end) 解释：该方法是对数组进行部分截取，并返回一个数组副本；参数start是截取的开始数组索引，end参数等于你要取的最后一个字符的位置值加上1（可选） ? 1 2 3 4 5 6 7 8 9 1
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="JavaScript" scheme="https://MLikelihood.github.io/tags/JavaScript/"/>
-    
-  </entry>
   
-  <entry>
-    <title>Android 截屏检测</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/android-screenshot-detection.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/android-screenshot-detection.html</id>
-    <published>2017-03-09T07:22:00.000Z</published>
-    <updated>2017-09-02T05:32:30.604Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】最近项目中新接到一个需求，对手机截屏进行检测并进行后续操作，类似于Snapchat，iOS具有先天优势，因iOS系统提供了相关API！Google无果之后原作者决定再次造轮子，为了持续表达对Rx的敬意，命名为RxScreenshotDetector， github 源码地址 。 效果有图有真相 原理 <a href="http://www.cnblogs.com/kaidarwang/p/6525878.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】最近项目中新接到一个需求，对手机截屏进行检测并进行后续操作，类似于Snapchat，iOS具有先天优势，因iOS系统提供了相关API！Google无果之后原作者决定再次造轮子，为了持续表达对Rx的敬意，命名为RxScreenshotDetector， github 
-    
-    </summary>
-    
-      <category term="programming" scheme="https://wangqingkai.github.io/categories/programming/"/>
-    
-    
-      <category term="Android" scheme="https://wangqingkai.github.io/tags/Android/"/>
-    
-  </entry>
   
-  <entry>
-    <title>js数组的sort排序详解</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/js-sort-explain.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/js-sort-explain.html</id>
-    <published>2017-02-28T06:57:00.000Z</published>
-    <updated>2017-09-02T14:03:26.613Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】<body> <div> sort()对数组排序，不开辟新的内存，对原有数组元素进行调换 </div> <div id="showBox"> 1、简单数组简单排序  var arrSimple=new Array(1,8,7,6); arrSimple.sort(); <a href="http://www.cnblogs.com/kaidarwang/p/6478896.html" target="_blank" rel="external">阅读全文</a></div></body></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】&lt;body&gt; &lt;div&gt; sort()对数组排序，不开辟新的内存，对原有数组元素进行调换 &lt;/div&gt; &lt;div id=&quot;showBox&quot;&gt; 1、简单数组简单排序  var arrSimple=new Array(1,8,7,6); arrSimple.sort()
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="JavaScript" scheme="https://wangqingkai.github.io/tags/JavaScript/"/>
-    
-  </entry>
+ 
   
-  <entry>
-    <title>jQuery诞生记-原理与机制</title>
-    <link href="https://wangqingkai.github.io/blogs/programming/jquery-birth-notes.html"/>
-    <id>https://wangqingkai.github.io/blogs/programming/jquery-birth-notes.html</id>
-    <published>2017-02-24T02:17:00.000Z</published>
-    <updated>2017-09-08T15:38:26.712Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】一、看似偶然的东西实际是必然会发生的 我大学时候在图书馆翻过一本很破旧的书，讲生物理论的，主要内容就是探讨生命的产生是偶然还是必然。里面很多亚里士多德都看不懂的公式计算什么的，还有模拟原始地球环境出现了有机物的实验什么的 。总之，书论述的观点是：“在当时的地球环境下，生命的产生是必然的！” 无数次机 <a href="http://www.cnblogs.com/kaidarwang/p/6437364.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】一、看似偶然的东西实际是必然会发生的 我大学时候在图书馆翻过一本很破旧的书，讲生物理论的，主要内容就是探讨生命的产生是偶然还是必然。里面很多亚里士多德都看不懂的公式计算什么的，还有模拟原始地球环境出现了有机物的实验什么的 。总之，书论述的观点是：“在当时的地球环境下
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="jQuery" scheme="https://MLikelihood.github.io/tags/jQuery/"/>
-    
-  </entry>
   
-  <entry>
-    <title>你所不知的 CSS ::before 和 ::after 伪元素用法</title>
-    <link href="https://MLikelihood.github.io/blogs/programming/css-pseudo-class-before-after.html"/>
-    <id>https://MLikelihood.github.io/blogs/programming/css-pseudo-class-before-after.html</id>
-    <published>2017-02-20T05:40:00.000Z</published>
-    <updated>2017-09-08T15:37:01.312Z</updated>
-    
-    <content type="html"><![CDATA[<p>【摘要】CSS 有两个说不上常用的伪类 :before 和 :after，偶尔会被人用来添加些自定义格式什么的，但是它们的功用不仅于此。前几天发现了 Creative Link Effects 这个非常有意思的介绍创意链接特效的页面，里面惊人的效果大量使用到的特性除了 transform 属性进行变形之外 <a href="http://www.cnblogs.com/kaidarwang/p/6419157.html" target="_blank" rel="external">阅读全文</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;【摘要】CSS 有两个说不上常用的伪类 :before 和 :after，偶尔会被人用来添加些自定义格式什么的，但是它们的功用不仅于此。前几天发现了 Creative Link Effects 这个非常有意思的介绍创意链接特效的页面，里面惊人的效果大量使用到的特性除了 tr
-    
-    </summary>
-    
-      <category term="programming" scheme="https://MLikelihood.github.io/categories/programming/"/>
-    
-    
-      <category term="CSS" scheme="https://MLikelihood.github.io/tags/CSS/"/>
-    
-  </entry>
+  
+ 
   
 </feed>
